@@ -252,7 +252,41 @@ const support = {
         const reward = coinItemValueAtOtterLevel * arr[index].multiplyRatio;
         return reward;
       }
-      
+      ,
+      calcCoinOverTake: (TGT_CoinInPool, ACT_CoinInPool) => {
+        let TGT_CoinOverTake = ACT_CoinInPool - TGT_CoinInPool
+        if(TGT_CoinOverTake > 0) {
+            return TGT_CoinOverTake
+        }else {
+            return 0
+        }
+      },
+      calcTgtCoinOutUnlockFromRaidDay: (TOT_CoinOut, TGT_CoinOutFromRaid_Rate, DayLoged, CoinOutFromRaidCurve, TGT_CoinOverTake, TGT_CoinInOverForRaid_Rate) => {
+        if(TGT_CoinOverTake > 0){
+            let sigma = 0
+            let total
+            for(let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++){
+                sigma += Math.pow(i, CoinOutFromRaidCurve)
+            }
+            total = TOT_CoinOut * TGT_CoinOutFromRaid_Rate * (Math.pow(DayLoged , CoinOutFromRaidCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForRaid_Rate
+            return total
+        }else{
+            return total = 0
+        }
+      },
+      calcTgtCoinOutUnlockFromStealDay: (TOT_CoinOut, TGT_CoinOutFromSteal_Rate, DayLoged, CoinOutFromStealCurve, TGT_CoinOverTake, TGT_CoinInOverForSteal_Rate) => {
+        if(TGT_CoinOverTake > 0){
+            let sigma = 0
+            let total
+            for(let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++){
+                sigma += Math.pow(i, CoinOutFromStealCurve)
+            }
+            total = TOT_CoinOut * TGT_CoinOutFromSteal_Rate * (Math.pow(DayLoged , CoinOutFromStealCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForSteal_Rate
+            return total
+        }else{
+            return total = 0
+        }
+      }
 };
 
 // Thong so thay doi
@@ -261,9 +295,9 @@ let ACTIAPPurcharge = 0
 let ACTDiamondUsed = 0
 let actPlayMinutesPerDay = 19.012222822833333
 let DayLoged = 1
-let TGT_CoinInPool = 2390000
+let TGT_CoinInPool = 5209366  
 let ACT_CoinInPool = 10000
-let combo = 7
+let combo = 2
 let curEnegy = 50
 
 
@@ -313,13 +347,7 @@ if(combo === 12) {
     reward = support.calcReward(combo, DATA.mainPool, coinItemValueAtOtterLevel)
 }
 
-
-
-console.log(`reward: ${reward}`)
-console.log(`coinClaimComboShield: ${coinClaimComboShield}`)
-console.log(`AVG_StealMissReward: ${AVG_StealMissReward}`)
-console.log(`AVG_StealFullReward: ${AVG_StealFullReward}`)
-console.log(`ACT_Comboweight: ${ACT_Comboweight}`)
-console.log(`ACT_ComboRatio: ${ACT_ComboRatio}`)
-console.log(`combo: ${combo}`)
-console.log(`--------------------------------------------------->`)
+// Calc ACT_CoinFromRaidDay
+let TGT_CoinOverTake = support.calcCoinOverTake(TGT_CoinInPool, ACT_CoinInPool)
+let TGT_CoinOutInPoolFromRaidDay = support.calcTgtCoinOutUnlockFromRaidDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromRaid_Rate, DayLoged, metric.pool.CoinOutFromRaidCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForRaid_Rate)
+let TGT_CoinInOverForSteal_Rate = support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromSteal_Rate, DayLoged, metric.pool.CoinOutFromStealCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForSteal_Rate)
