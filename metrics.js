@@ -350,4 +350,4 @@ if(combo === 12) {
 // Calc ACT_CoinFromRaidDay
 let TGT_CoinOverTake = support.calcCoinOverTake(TGT_CoinInPool, ACT_CoinInPool)
 let TGT_CoinOutInPoolFromRaidDay = support.calcTgtCoinOutUnlockFromRaidDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromRaid_Rate, DayLoged, metric.pool.CoinOutFromRaidCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForRaid_Rate)
-let TGT_CoinInOverForSteal_Rate = support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromSteal_Rate, DayLoged, metric.pool.CoinOutFromStealCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForSteal_Rate)
+let TGT_CoinOutInPoolFromStealDay = support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromSteal_Rate, DayLoged, metric.pool.CoinOutFromStealCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForSteal_Rate)
