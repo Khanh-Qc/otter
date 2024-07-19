@@ -262,30 +262,25 @@ const support = {
         }
       },
       calcTgtCoinOutUnlockFromRaidDay: (TOT_CoinOut, TGT_CoinOutFromRaid_Rate, DayLoged, CoinOutFromRaidCurve, TGT_CoinOverTake, TGT_CoinInOverForRaid_Rate) => {
-        if(TGT_CoinOverTake > 0){
-            let sigma = 0
-            let total
-            for(let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++){
-                sigma += Math.pow(i, CoinOutFromRaidCurve)
-            }
-            total = TOT_CoinOut * TGT_CoinOutFromRaid_Rate * (Math.pow(DayLoged , CoinOutFromRaidCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForRaid_Rate
-            return total
-        }else{
-            return total = 0
+        let sigma = 0
+        let total
+        for(let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++){
+            sigma += Math.pow(i, CoinOutFromRaidCurve)
         }
+        total = TOT_CoinOut * TGT_CoinOutFromRaid_Rate * (Math.pow(DayLoged , CoinOutFromRaidCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForRaid_Rate
+        return total
       },
       calcTgtCoinOutUnlockFromStealDay: (TOT_CoinOut, TGT_CoinOutFromSteal_Rate, DayLoged, CoinOutFromStealCurve, TGT_CoinOverTake, TGT_CoinInOverForSteal_Rate) => {
-        if(TGT_CoinOverTake > 0){
-            let sigma = 0
-            let total
-            for(let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++){
-                sigma += Math.pow(i, CoinOutFromStealCurve)
-            }
-            total = TOT_CoinOut * TGT_CoinOutFromSteal_Rate * (Math.pow(DayLoged , CoinOutFromStealCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForSteal_Rate
-            return total
-        }else{
-            return total = 0
+        let sigma = 0
+        let total
+        for(let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++){
+            sigma += Math.pow(i, CoinOutFromStealCurve)
         }
+        total = TOT_CoinOut * TGT_CoinOutFromSteal_Rate * (Math.pow(DayLoged , CoinOutFromStealCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForSteal_Rate
+        return total
+      },
+      calcTgtCoinOutFromRaid: (TGT_CoinOutPoolFromRaidDay, TGT_CoinOverTake) => {
+        return TGT_CoinOutPoolFromRaidDay + TGT_CoinOverTake
       }
 };
 
@@ -349,5 +344,9 @@ if(combo === 12) {
 
 // Calc ACT_CoinFromRaidDay
 let TGT_CoinOverTake = support.calcCoinOverTake(TGT_CoinInPool, ACT_CoinInPool)
-let TGT_CoinOutInPoolFromRaidDay = support.calcTgtCoinOutUnlockFromRaidDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromRaid_Rate, DayLoged, metric.pool.CoinOutFromRaidCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForRaid_Rate)
-let TGT_CoinOutInPoolFromStealDay = support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromSteal_Rate, DayLoged, metric.pool.CoinOutFromStealCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForSteal_Rate)
+let TGT_CoinOutPoolFromRaidDay = support.calcTgtCoinOutUnlockFromRaidDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromRaid_Rate, DayLoged, metric.pool.CoinOutFromRaidCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForRaid_Rate)
+let TGT_CoinOutPoolFromStealDay = support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromSteal_Rate, DayLoged, metric.pool.CoinOutFromStealCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForSteal_Rate)
+
+// Calc tgtCoinOutFromRaid
+let TGT_CoinOutFromRaid = support.calcTgtCoinOutFromRaid(TGT_CoinOutPoolFromRaidDay, TGT_CoinOverTake)
+let TGT_CoinOutFromSteal = TGT_CoinOutPoolFromStealDay
