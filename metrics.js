@@ -279,8 +279,8 @@ const support = {
         total = TOT_CoinOut * TGT_CoinOutFromSteal_Rate * (Math.pow(DayLoged , CoinOutFromStealCurve ) / sigma ) + TGT_CoinOverTake * TGT_CoinInOverForSteal_Rate
         return total
       },
-      calcTgtCoinOutFromRaid: (TGT_CoinOutPoolFromRaidDay, TGT_CoinOverTake) => {
-        return TGT_CoinOutPoolFromRaidDay + TGT_CoinOverTake
+      calcSumCoinOut: (oldValue, newValue ) => {
+        return oldValue + newValue
       }
 };
 
@@ -290,8 +290,8 @@ let ACTIAPPurcharge = 0
 let ACTDiamondUsed = 0
 let actPlayMinutesPerDay = 19.012222822833333
 let DayLoged = 1
-let TGT_CoinInPool = 5209366  
-let ACT_CoinInPool = 10000
+let TGT_CoinInPool = 5209365.545656615
+let ACT_CoinInPool = 6209365
 let combo = 2
 let curEnegy = 50
 
@@ -345,8 +345,31 @@ if(combo === 12) {
 // Calc ACT_CoinFromRaidDay
 let TGT_CoinOverTake = support.calcCoinOverTake(TGT_CoinInPool, ACT_CoinInPool)
 let TGT_CoinOutPoolFromRaidDay = support.calcTgtCoinOutUnlockFromRaidDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromRaid_Rate, DayLoged, metric.pool.CoinOutFromRaidCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForRaid_Rate)
-let TGT_CoinOutPoolFromStealDay = support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, metric.coin.TGT_CoinOutFromSteal_Rate, DayLoged, metric.pool.CoinOutFromStealCurve, TGT_CoinOverTake, metric.pool.TGT_CoinInOverForSteal_Rate)
+let TGT_CoinOutPoolFromStealDay = 
+support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut, 
+    metric.coin.TGT_CoinOutFromSteal_Rate, 
+    DayLoged, 
+    metric.pool.CoinOutFromStealCurve, 
+    TGT_CoinOverTake, 
+    metric.pool.TGT_CoinInOverForSteal_Rate)
 
 // Calc tgtCoinOutFromRaid
-let TGT_CoinOutFromRaid = support.calcTgtCoinOutFromRaid(TGT_CoinOutPoolFromRaidDay, TGT_CoinOverTake)
-let TGT_CoinOutFromSteal = TGT_CoinOutPoolFromStealDay
+let TGT_CoinOutFromRaid = support.calcSumCoinOut(0, TGT_CoinOutPoolFromRaidDay)
+let TGT_CoinOutFromSteal = support.calcSumCoinOut(0, TGT_CoinOutPoolFromStealDay)
+
+// Calc ACT_CoinOutFromRaidDay
+let CoinClaimComboShield = coinItemValueAtOtterLevel * DATA.mainPool[6].multiplyRatio
+
+console.log(`TGT_CoinInPool: ${TGT_CoinInPool}`)
+console.log(`ACT_CoinInPool: ${ACT_CoinInPool}`)
+console.log(`TOT_CoinOut: ${TOT_CoinOut}`)
+console.log(`TGT_CoinOutFromSteal_Rate: ${metric.coin.TGT_CoinOutFromSteal_Rate}`)
+console.log(`DayLoged: ${DayLoged}`)
+console.log(`CoinOutFromStealCurve: ${metric.pool.CoinOutFromStealCurve}`)
+console.log(`TGT_CoinOverTake: ${TGT_CoinOverTake}`)
+console.log(`TGT_CoinInOverForSteal_Rate: ${metric.pool.TGT_CoinInOverForSteal_Rate}`)
+console.log(`result =================================================>`)
+console.log(`TGT_CoinOutPoolFromRaidDay: ${TGT_CoinOutPoolFromRaidDay}`)
+console.log(`TGT_CoinOutPoolFromStealDay: ${TGT_CoinOutPoolFromStealDay}`)
+console.log(`TGT_CoinOutFromRaid: ${TGT_CoinOutFromRaid}`)
+console.log(`TGT_CoinOutFromSteal: ${TGT_CoinOutFromSteal}`)
