@@ -1,99 +1,3 @@
-
-// Function calculate CoinItemValueAtOtterLevel
-function calculateCoinItemValueAtOtterLevel(baseCoinItemValue, inflationRate, inflationCycle, ACTOtterLevel) {
-    return baseCoinItemValue * (1 + inflationRate) ** Math.floor(ACTOtterLevel / inflationCycle);
-}
-
-// Hàm tính năng lượng tối đa
-function countMaxEnergy(ACTCurOtterLevel) {
-    const baseEnergy = 50;
-    const inflatedEnergy = baseEnergy * (1 + metric.coin.EnergyInflation_Rate) ** Math.floor(ACTCurOtterLevel / metric.coin.EnergyInflationCycle);
-    return roundNearestFive(inflatedEnergy); // Làm tròn tới số chia hết cho 5 gần nhất
-}
-
-// Hàm làm tròn số gần nhất và chia hết cho 5
-function roundNearestFive(number) {
-    let roundedNumber = Math.floor(number);
-    let remainder = roundedNumber % 5;
-
-    if (remainder >= 3) {
-        roundedNumber += (5 - remainder);
-    } else {
-        roundedNumber -= remainder;
-    }
-
-    return roundedNumber;
-}
-
-// function tính tổng số coin cần Upgrade để lên level
-function countTgtTotalCoinUpgradeOfOtterLevel(curLevel) {
-    let sigma = 0;
-    let total
-    for (let i = 1; i <= metric.targetMetrics.TGT_TargetOtterLevel; i++) {
-        sigma += Math.pow(i, metric.coin.CoinUpgradeCurve);
-    }
-    total = metric.coin.TGT_CoinOutFromUpgrade_Rate * TOT_CoinOut  * (Math.pow(curLevel , metric.coin.CoinUpgradeCurve) / sigma )
-    return total;
-}
-
-// Function check ACT purcharge IAP
-function calculateACTIAPConvertToCoin(iapPurchasePriceInUSD, usdRate, inflationRate, actOtterLevel, inflationCycle) {
-    // Kiểm tra xem các giá trị đầu vào có hợp lệ hay không
-    if (isNaN(iapPurchasePriceInUSD) || isNaN(usdRate) || isNaN(inflationRate) || isNaN(actOtterLevel) || isNaN(inflationCycle)) {
-      throw new Error("Giá trị đầu vào không hợp lệ");
-    }
-  
-    // Tính toán số chu kỳ lạm phát
-    const inflationCycles = Math.floor(actOtterLevel / inflationCycle);
-  
-    // Tính toán tỷ lệ lạm phát tích lũy
-    const accumulatedInflationRate = Math.pow(1 + inflationRate, inflationCycles);
-  
-    // Tính toán giá trị ACT_IAPConvertToCoin
-    const actIAPConvertToCoin = iapPurchasePriceInUSD * usdRate * accumulatedInflationRate;
-  
-    return actIAPConvertToCoin;
-  }
-
-  // Function count ACTSpin
-  function calculateACTSpinFromDiamondConvertToCoin(actDiamondUsed, diamondToCoinRate, inflationRate, actOtterLevel, inflationCycle) {
-    // Check for valid input values
-    if (isNaN(actDiamondUsed) || isNaN(diamondToCoinRate) || isNaN(inflationRate) || isNaN(actOtterLevel) || isNaN(inflationCycle)) {
-      throw new Error("Invalid input values");
-    }
-  
-    // Calculate inflation cycles
-    const inflationCycles = Math.floor(actOtterLevel / inflationCycle);
-  
-    // Calculate accumulated inflation rate
-    const accumulatedInflationRate = Math.pow(1 + inflationRate, inflationCycles);
-  
-    // Calculate ACT_SpinFromDiamondConvertToCoin
-    const actSpinFromDiamondConvertToCoin = actDiamondUsed * diamondToCoinRate * accumulatedInflationRate;
-  
-    return actSpinFromDiamondConvertToCoin;
-  }
-
-// Function coun Total CoinInPool
-function countTGTCoinInPoolUnclockDay(TOT_CoinIn, Dayloged, CoinInCurve , actIAPConvertToCoin, actSpinFromDiamondConvertToCoin) {
-    let sigma = 0;
-    let total
-    for (let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++) {
-        sigma += Math.pow(i, metric.coin.CoinInCurve);
-    }
-    total = TOT_CoinIn  * (Math.pow(DayLoged , metric.coin.CoinInCurve) / sigma ) + actIAPConvertToCoin + actSpinFromDiamondConvertToCoin
-    return total;
-}
-
-// Function count SpinRatio
-function calcACTSpinRatioConstanst(TGT_CoinInPool, ACT_CoinInPool){
-    if (typeof TGT_CoinInPool !== "number" || typeof ACT_CoinInPool !== "number") {
-        throw new Error("Invalid arguments: both arguments must be numbers");
-      }
-      let ACT_SpinRationConstanst = Math.min(TGT_CoinInPool /  ACT_CoinInPool, 3) - 1.75
-      return ACT_SpinRationConstanst;
-}
-
 const metric = {
     targetMetrics: {
         TGT_DayPlay: 90,
@@ -205,6 +109,20 @@ const DATA = {
     ]
 };
 
+// Hàm làm tròn số gần nhất và chia hết cho 5
+function roundNearestFive(number) {
+    let roundedNumber = Math.floor(number);
+    let remainder = roundedNumber % 5;
+
+    if (remainder >= 3) {
+        roundedNumber += (5 - remainder);
+    } else {
+        roundedNumber -= remainder;
+    }
+
+    return roundedNumber;
+}
+
 const support = {
     findMaxNumber: (arr) => {
         let max = 0;
@@ -281,7 +199,88 @@ const support = {
       },
       calcSumCoinOut: (oldValue, newValue ) => {
         return oldValue + newValue
+      },
+
+    // Function calculate CoinItemValueAtOtterLevel
+calculateCoinItemValueAtOtterLevel: (baseCoinItemValue, inflationRate, inflationCycle, ACTOtterLevel) =>  {
+    return baseCoinItemValue * (1 + inflationRate) ** Math.floor(ACTOtterLevel / inflationCycle);
+},
+
+// Hàm tính năng lượng tối đa
+countMaxEnergy: (ACTCurOtterLevel) => {
+    const baseEnergy = 50;
+    const inflatedEnergy = baseEnergy * (1 + metric.coin.EnergyInflation_Rate) ** Math.floor(ACTCurOtterLevel / metric.coin.EnergyInflationCycle);
+    return roundNearestFive(inflatedEnergy); // Làm tròn tới số chia hết cho 5 gần nhất
+},
+
+// function tính tổng số coin cần Upgrade để lên level
+countTgtTotalCoinUpgradeOfOtterLevel: (curLevel) =>  {
+    let sigma = 0;
+    let total
+    for (let i = 1; i <= metric.targetMetrics.TGT_TargetOtterLevel; i++) {
+        sigma += Math.pow(i, metric.coin.CoinUpgradeCurve);
+    }
+    total = metric.coin.TGT_CoinOutFromUpgrade_Rate * TOT_CoinOut  * (Math.pow(curLevel , metric.coin.CoinUpgradeCurve) / sigma )
+    return total;
+},
+
+// Function check ACT purcharge IAP
+calculateACTIAPConvertToCoin: (iapPurchasePriceInUSD, usdRate, inflationRate, actOtterLevel, inflationCycle) => {
+    // Kiểm tra xem các giá trị đầu vào có hợp lệ hay không
+    if (isNaN(iapPurchasePriceInUSD) || isNaN(usdRate) || isNaN(inflationRate) || isNaN(actOtterLevel) || isNaN(inflationCycle)) {
+      throw new Error("Giá trị đầu vào không hợp lệ");
+    }
+  
+    // Tính toán số chu kỳ lạm phát
+    const inflationCycles = Math.floor(actOtterLevel / inflationCycle);
+  
+    // Tính toán tỷ lệ lạm phát tích lũy
+    const accumulatedInflationRate = Math.pow(1 + inflationRate, inflationCycles);
+  
+    // Tính toán giá trị ACT_IAPConvertToCoin
+    const actIAPConvertToCoin = iapPurchasePriceInUSD * usdRate * accumulatedInflationRate;
+  
+    return actIAPConvertToCoin;
+  },
+
+  // Function count ACTSpin
+  calculateACTSpinFromDiamondConvertToCoin: (actDiamondUsed, diamondToCoinRate, inflationRate, actOtterLevel, inflationCycle) => {
+    // Check for valid input values
+    if (isNaN(actDiamondUsed) || isNaN(diamondToCoinRate) || isNaN(inflationRate) || isNaN(actOtterLevel) || isNaN(inflationCycle)) {
+      throw new Error("Invalid input values");
+    }
+  
+    // Calculate inflation cycles
+    const inflationCycles = Math.floor(actOtterLevel / inflationCycle);
+  
+    // Calculate accumulated inflation rate
+    const accumulatedInflationRate = Math.pow(1 + inflationRate, inflationCycles);
+  
+    // Calculate ACT_SpinFromDiamondConvertToCoin
+    const actSpinFromDiamondConvertToCoin = actDiamondUsed * diamondToCoinRate * accumulatedInflationRate;
+  
+    return actSpinFromDiamondConvertToCoin;
+  },
+
+// Function coun Total CoinInPool
+countTGTCoinInPoolUnclockDay: (TOT_CoinIn, Dayloged, CoinInCurve , actIAPConvertToCoin, actSpinFromDiamondConvertToCoin) =>  {
+    let sigma = 0;
+    let total
+    for (let i = 1; i <= metric.targetMetrics.TGT_DayPlay; i++) {
+        sigma += Math.pow(i, metric.coin.CoinInCurve);
+    }
+    total = TOT_CoinIn  * (Math.pow(DayLoged , metric.coin.CoinInCurve) / sigma ) + actIAPConvertToCoin + actSpinFromDiamondConvertToCoin
+    return total;
+},
+
+// Function count SpinRatio
+calcACTSpinRatioConstanst: (TGT_CoinInPool, ACT_CoinInPool) => {
+    if (typeof TGT_CoinInPool !== "number" || typeof ACT_CoinInPool !== "number") {
+        throw new Error("Invalid arguments: both arguments must be numbers");
       }
+      let ACT_SpinRationConstanst = Math.min(TGT_CoinInPool /  ACT_CoinInPool, 3) - 1.75
+      return ACT_SpinRationConstanst;
+}
 };
 
 // Thong so thay doi
@@ -307,20 +306,20 @@ let isB = metric.exchangeRate.CoinToUSD * [1 + (1 + metric.exchangeRate.Inflatio
 let TOT_CoinIn = Math.ceil((isA * isB) / 2)
 let TOT_CoinOut = TOT_CoinIn * metric.coin.TGT_CoinOut_Rate
 
-let coinItemValueAtOtterLevel = calculateCoinItemValueAtOtterLevel(metric.exchangeRate.baseCoinItemValue, metric.exchangeRate.InflationRate, metric.exchangeRate.InflationCycle, ACTCurOtterLevel);
-let maxEnergy = countMaxEnergy(ACTCurOtterLevel);
+let coinItemValueAtOtterLevel = support.calculateCoinItemValueAtOtterLevel(metric.exchangeRate.baseCoinItemValue, metric.exchangeRate.InflationRate, metric.exchangeRate.InflationCycle, ACTCurOtterLevel);
+let maxEnergy = support.countMaxEnergy(ACTCurOtterLevel);
 let energyRegen = (metric.targetMetrics.TGT_SessionPerDay * maxEnergy ) / 24
 let IAPPurchargePriceInUSD = 1
 let ACT_IAPConvertToCoin = IAPPurchargePriceInUSD * metric.exchangeRate.CoinToUSD * (1 + metric.exchangeRate.InflationRate) ** Math.floor(ACTCurOtterLevel / metric.exchangeRate.InflationCycle)
 let CoinClaimCombo = coinItemValueAtOtterLevel * metric.spin[ACTCurOtterLevel]
-let TGT_TotalCoinUpgradeOfOtterLevel = countTgtTotalCoinUpgradeOfOtterLevel(ACTCurOtterLevel);
+let TGT_TotalCoinUpgradeOfOtterLevel = support.countTgtTotalCoinUpgradeOfOtterLevel(ACTCurOtterLevel);
 
-let actIAPConvertToCoin = calculateACTIAPConvertToCoin(ACTIAPPurcharge, metric.exchangeRate.CoinToUSD, metric.exchangeRate.InflationRate, ACTCurOtterLevel, metric.exchangeRate.InflationCycle);
-let actSpinFromDiamondConvertToCoin = calculateACTSpinFromDiamondConvertToCoin(ACTDiamondUsed, metric.exchangeRate.CoinToDiamond, metric.exchangeRate.InflationRate, ACTCurOtterLevel, metric.exchangeRate.InflationCycle);
-let TGT_CoinInPoolUnlockDay = countTGTCoinInPoolUnclockDay(TOT_CoinIn, DayLoged, metric.coin.CoinInCurve, actIAPConvertToCoin, actSpinFromDiamondConvertToCoin)
+let actIAPConvertToCoin = support.calculateACTIAPConvertToCoin(ACTIAPPurcharge, metric.exchangeRate.CoinToUSD, metric.exchangeRate.InflationRate, ACTCurOtterLevel, metric.exchangeRate.InflationCycle);
+let actSpinFromDiamondConvertToCoin = support.calculateACTSpinFromDiamondConvertToCoin(ACTDiamondUsed, metric.exchangeRate.CoinToDiamond, metric.exchangeRate.InflationRate, ACTCurOtterLevel, metric.exchangeRate.InflationCycle);
+let TGT_CoinInPoolUnlockDay = support.countTGTCoinInPoolUnclockDay(TOT_CoinIn, DayLoged, metric.coin.CoinInCurve, actIAPConvertToCoin, actSpinFromDiamondConvertToCoin)
 
 // Calc ACT_SpinRatioConstanst
-let ACT_SpinRatioConstanst = calcACTSpinRatioConstanst(TGT_CoinInPool, ACT_CoinInPool)
+let ACT_SpinRatioConstanst = support.calcACTSpinRatioConstanst(TGT_CoinInPool, ACT_CoinInPool)
 
 // Calc spin
 let maxMultiRatio = support.findMaxNumber(DATA.mainPool)
@@ -353,7 +352,7 @@ support.calcTgtCoinOutUnlockFromStealDay(TOT_CoinOut,
     TGT_CoinOverTake, 
     metric.pool.TGT_CoinInOverForSteal_Rate)
 
-// Calc tgtCoinOutFromRaid
+// Calc tgtCoinOutFromRaid => chưa tính được số TGT
 let TGT_CoinOutFromRaid = support.calcSumCoinOut(0, TGT_CoinOutPoolFromRaidDay)
 let TGT_CoinOutFromSteal = support.calcSumCoinOut(0, TGT_CoinOutPoolFromStealDay)
 
